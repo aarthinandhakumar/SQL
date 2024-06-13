@@ -52,6 +52,7 @@ Joining tables to combine data from multiple sources.
 Feel free to modify and extend the queries as needed for your specific use case.
 
 **Troubleshooting**
+
 If you encounter any issues, consider the following troubleshooting steps:
 
 Syntax Errors: Double-check the SQL syntax in your scripts.
