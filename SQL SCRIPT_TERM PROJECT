@@ -1,0 +1,596 @@
+DROP TABLE NDC_Change;
+DROP TABLE Prescription;
+DROP TABLE OTC;
+DROP TABLE Prescription_Type;
+DROP TABLE Medication;
+DROP TABLE Historical_Diagnosis;
+DROP TABLE Diagnosis;
+DROP TABLE Children;
+DROP TABLE Insurance;
+DROP TABLE Specialty;
+DROP TABLE Appointment;
+DROP TABLE Doctor;
+DROP TABLE Patient;
+
+DROP SEQUENCE patient_seq;
+DROP SEQUENCE appointment_seq;
+DROP SEQUENCE doctor_seq;
+DROP SEQUENCE specialty_seq;
+DROP SEQUENCE insurance_seq;
+DROP SEQUENCE children_seq;
+DROP SEQUENCE diagnosis_seq;
+DROP SEQUENCE his_diagnosis_seq;
+DROP SEQUENCE medication_seq;
+DROP SEQUENCE prescription_seq;
+DROP SEQUENCE otc_seq;
+DROP SEQUENCE prescription_type_seq;
+DROP SEQUENCE NDC_Change_seq;
+
+
+--TABLE CREATION
+
+CREATE TABLE Patient(
+Patient_ID DECIMAL(12) NOT NULL,
+First_name VARCHAR(50) NOT NULL,
+Last_name VARCHAR(50) NOT NULL,
+Age DECIMAL(2) NOT NULL,
+Gender VARCHAR(20) NOT NULL,
+Phone_number DECIMAL(10) NOT NULL,
+Email VARCHAR(50) NOT NULL, 
+Home_Address VARCHAR(50) NOT NULL,
+Register_Date DATE NOT NULL,
+PRIMARY KEY (Patient_ID));
+
+CREATE TABLE Doctor(
+Doctor_ID DECIMAL(12) NOT NULL,
+Doctor_Name VARCHAR(50) NOT NULL,
+Doctor_Type VARCHAR(50) NOT NULL,
+Effective_Date DATE NOT NULL
+PRIMARY KEY (Doctor_ID));
+
+CREATE TABLE Appointment(
+Appointment_ID DECIMAL(12) NOT NULL,
+Doctor_ID DECIMAL(12) NOT NULL,
+Patient_ID DECIMAL(12) NOT NULL,
+Appointment_Date DATE NOT NULL,
+Appointment_Time VARCHAR(10) NOT NULL,
+Appointment_Type VARCHAR(10) NOT NULL,
+Appointment_Duration VARCHAR(20) NOT NULL,
+Appointment_Status VARCHAR(10) NOT NULL,
+PRIMARY KEY (Appointment_ID),
+FOREIGN KEY (Doctor_ID) REFERENCES Doctor,
+FOREIGN KEY (Patient_ID) REFERENCES Patient);
+
+CREATE TABLE Specialty(
+Specialty_ID DECIMAL(12) NOT NULL,
+Doctor_ID DECIMAL(12) NOT NULL,
+Specialty_Name VARCHAR(50) NOT NULL,
+Affiliated_With VARCHAR(50) NOT NULL,
+PRIMARY KEY (Specialty_ID),
+FOREIGN KEY (Doctor_ID) REFERENCES Doctor);
+
+CREATE TABLE Insurance(
+Insurance_ID DECIMAL(12) NOT NULL,
+Patient_ID DECIMAL(12) NOT NULL,
+Insurance_Name VARCHAR(20) NOT NULL,
+Insurance_Date DATE NOT NULL,
+Policy_Number VARCHAR(15) NOT NULL,
+Insurance_Phone VARCHAR(10) NOT NULL,
+PRIMARY KEY (Insurance_ID),
+FOREIGN KEY (Patient_ID) REFERENCES Patient);
+
+CREATE TABLE Children(
+Children_ID DECIMAL(12) NOT NULL,
+Patient_ID DECIMAL(12) NOT NULL,
+Number_of_Children DECIMAL(1) NOT NULL,
+Is_Autistic VARCHAR(20) NOT NULL,
+PRIMARY KEY (Children_ID),
+FOREIGN KEY (Patient_ID) REFERENCES Patient);
+
+CREATE TABLE Diagnosis(
+Diagnosis_ID DECIMAL(12) NOT NULL,
+Patient_ID DECIMAL(12) NOT NULL,
+Diagnosis_Name VARCHAR(50) NOT NULL,
+Diagnosis_Notes VARCHAR(250),
+PRIMARY KEY (Diagnosis_ID),
+FOREIGN KEY (Patient_ID) REFERENCES Patient);
+
+CREATE TABLE Historical_Diagnosis(
+Historical_Diagnosis_ID DECIMAL(12) NOT NULL,
+Patient_ID DECIMAL(12) NOT NULL,
+Historical_Diagnosis_Name VARCHAR(50) NOT NULL,
+Historical_Diagnosis_Notes VARCHAR(250),
+PRIMARY KEY (Historical_Diagnosis_ID),
+FOREIGN KEY (Patient_ID) REFERENCES Patient);
+
+CREATE TABLE Medication(
+Medication_ID DECIMAL(12) NOT NULL,
+Patient_ID DECIMAL(12) NOT NULL,
+Medication_Name VARCHAR(50) NOT NULL,
+NDC_Number VARCHAR(20) NOT NULL,
+Manufacturer VARCHAR(20) NOT NULL,
+Manufactured_Date DATE NOT NULL,
+Expiry_Date DATE NOT NULL,
+PRIMARY KEY (Medication_ID),
+FOREIGN KEY (Patient_ID) REFERENCES Patient);
+
+
+CREATE TABLE Prescription_Type(
+Pres_Type_ID DECIMAL(12) NOT NULL,
+Pres_Method VARCHAR(20) NOT NULL,
+Pres_quantity VARCHAR(20) NOT NULL,
+Pharmacy_Name VARCHAR(20) NOT NULL,
+PRIMARY KEY (Pres_Type_ID));
+
+CREATE TABLE Prescription(
+Medication_ID DECIMAL(12) NOT NULL,
+Doctor_ID DECIMAL(12) NOT NULL,
+Pres_Type_ID DECIMAL(12) NOT NULL,
+Pres_Mode VARCHAR(20) NOT NULL,
+Pres_date DATE NOT NULL,
+PRIMARY KEY (Medication_ID),
+FOREIGN KEY (Medication_ID) REFERENCES Medication,
+FOREIGN KEY (Doctor_ID) REFERENCES Doctor,
+FOREIGN KEY (Pres_Type_ID) REFERENCES Prescription_Type);
+
+CREATE TABLE OTC(
+Medication_ID DECIMAL(12) NOT NULL,
+Age_limit VARCHAR(20) NOT NULL,
+Instructions VARCHAR(50) NOT NULL,
+PRIMARY KEY (Medication_ID),
+FOREIGN KEY (Medication_ID) REFERENCES Medication);
+
+
+-- INDEX CREATION
+
+CREATE INDEX AppDocIdx
+ON Appointment(Doctor_ID);
+
+CREATE INDEX AppPatIdx
+ON Appointment(Patient_ID);
+
+CREATE INDEX SpecDocIdx
+ON Specialty(Doctor_ID);
+
+CREATE INDEX InsPatIdx
+ON Insurance(Patient_ID);
+
+CREATE INDEX ChilPatIdx
+ON Children(Patient_ID);
+
+CREATE INDEX DiagPatIdx
+ON Diagnosis(Patient_ID);
+
+CREATE INDEX HistDiagPatIdx
+ON Historical_Diagnosis(Patient_ID);
+
+CREATE INDEX MediPatIdx
+ON Medication(Patient_ID);
+
+CREATE INDEX PresMedIdx
+ON Prescription(Medication_ID);
+
+CREATE INDEX PresDocIdx
+ON Prescription(Doctor_ID);
+
+CREATE INDEX PresPresTypeIdx
+ON Prescription(Pres_Type_ID);
+
+CREATE INDEX OTCMedIdx
+ON Prescription(Medication_ID);
+
+CREATE INDEX AppStatIdx
+ON Appointment(Appointment_Status);
+
+CREATE INDEX MediPresIdx
+ON Medication(Medication_Name);
+
+CREATE INDEX DiagnosisIdx
+ON Diagnosis(Diagnosis_Name);
+
+
+-- SEQUENCE CREATION
+
+CREATE SEQUENCE patient_seq START WITH 1;
+CREATE SEQUENCE appointment_seq START WITH 1;
+CREATE SEQUENCE doctor_seq START WITH 1;
+CREATE SEQUENCE specialty_seq START WITH 1;
+CREATE SEQUENCE insurance_seq START WITH 1;
+CREATE SEQUENCE children_seq START WITH 1;
+CREATE SEQUENCE diagnosis_seq START WITH 1;
+CREATE SEQUENCE his_diagnosis_seq START WITH 1;
+CREATE SEQUENCE medication_seq START WITH 1;
+CREATE SEQUENCE prescription_type_seq START WITH 1;
+CREATE SEQUENCE otc_seq START WITH 1;
+CREATE SEQUENCE prescription_seq START WITH 1;
+
+
+
+-- INSERTS
+
+
+DECLARE @current_patient_seq INT  = NEXT VALUE FOR patient_seq;
+INSERT INTO Patient VALUES(@current_patient_seq, 'Andrea', 'West', 34, 'Female', 3134457669, 'awest90@gmail.com', '642, newberry ave, Newark , CA', CAST('24-OCT-2023' AS DATE));
+SET @current_patient_seq = NEXT VALUE FOR patient_seq;
+INSERT INTO Patient VALUES(@current_patient_seq, 'Cynthia', 'James', 33, 'Female', 3124024221, 'cjames91@gmail.com', '1092, mashburn st, Fremont, CA', CAST('03-MAY-2023' AS DATE));
+SET @current_patient_seq = NEXT VALUE FOR patient_seq;
+INSERT INTO Patient VALUES(@current_patient_seq, 'Gerard', 'Farmer', 38, 'Male', 8320987123, 'gfarm86@yahoo.com', '331, beaumont rd, Union City, CA', CAST('01-MAR-2024' AS DATE));
+SET @current_patient_seq = NEXT VALUE FOR patient_seq;
+INSERT INTO Patient VALUES(@current_patient_seq, 'Hyacinth', 'Ellens', 29, 'Female', 4890763422, 'hellens95@gmail.com', '3400, oakbush apt, Folsom, CA', CAST('04-JAN-2024' AS DATE));
+SET @current_patient_seq = NEXT VALUE FOR patient_seq;
+INSERT INTO Patient VALUES(@current_patient_seq, 'Jim', 'Doran', 30, 'Male', 9047658876, 'jdoran94@yahoo.com', '94, rockville apt, Cupertino CA', CAST('07-FEB-2024' AS DATE));
+SET @current_patient_seq = NEXT VALUE FOR patient_seq;
+INSERT INTO Patient VALUES(@current_patient_seq, 'Dave', 'Cooper', 41, 'Male', 8008187665, 'dcooper83@gmail.com', '422, madera ave, Sunnyvale, CA', CAST('06-MAR-2024' AS DATE));
+SET @current_patient_seq = NEXT VALUE FOR patient_seq;
+INSERT INTO Patient VALUES(@current_patient_seq, 'Fredda', 'Kart', 27, 'Female', 1467760192, 'fkart97@@yahoo.com', '133, mason st st, San Pedro, CA', CAST('01-SEP-2023' AS DATE));
+SET @current_patient_seq = NEXT VALUE FOR patient_seq;
+INSERT INTO Patient VALUES(@current_patient_seq, 'Lisanne', 'Jackson', 31, 'Female', 4340912090, 'ljackson93@yahoo.com', '88, morgan st, Santa Clara, CA', CAST('11-JAN-2024' AS DATE));
+SET @current_patient_seq = NEXT VALUE FOR patient_seq;
+INSERT INTO Patient VALUES(@current_patient_seq, 'Olivia', 'Scott', 28, 'Female', 2008600910, 'oscott96@yahoo.com', '334, madison ave, San jose, CA', CAST('17-NOV-2023' AS DATE));
+SET @current_patient_seq = NEXT VALUE FOR patient_seq;
+INSERT INTO Patient VALUES(@current_patient_seq, 'Quentin', 'Hill', 35, 'Male', 8081090121, 'jqhill89@gmail.com', '106, rodger dr, San Mateo, CA', CAST('16- JUN-2023' AS DATE));
+
+SELECT * FROM Patient;
+
+DECLARE @current_doctor_seq INT = NEXT VALUE FOR doctor_seq;
+INSERT INTO Doctor VALUES(@current_doctor_seq, 'George Marsh','Psychiatrist', CAST('23-NOV-2020' AS DATE));
+SET @current_doctor_seq = NEXT VALUE FOR doctor_seq;
+INSERT INTO Doctor VALUES(@current_doctor_seq, 'Ariel Hugo','Therapist', CAST ('27-SEP-2022' AS DATE));
+SET @current_doctor_seq = NEXT VALUE FOR doctor_seq;
+INSERT INTO Doctor VALUES(@current_doctor_seq, 'Miguel Sanchez','Clinical Psychologist', CAST('18-AUG-2023' AS DATE));
+SET @current_doctor_seq = NEXT VALUE FOR doctor_seq;
+INSERT INTO Doctor VALUES(@current_doctor_seq, 'Sudha Mehra','Psychiatrist', CAST('11-MAY-2018' AS DATE));
+SET @current_doctor_seq = NEXT VALUE FOR doctor_seq;
+INSERT INTO Doctor VALUES(@current_doctor_seq, 'Tony Lee','Clinical Psychologist', CAST('03-JUN-2019' AS DATE));
+
+SELECT * FROM Doctor;
+
+DECLARE @current_appointment_seq INT = NEXT VALUE FOR appointment_seq;
+INSERT INTO Appointment VALUES(@current_appointment_seq,(SELECT Doctor_ID FROM Doctor where Doctor_Name = 'George Marsh'), (SELECT PATIENT_ID FROM Patient where Last_name = 'Ellens'), CAST('02-APR-2024' AS DATE), '14:30:10', 'Consult', '45 minutes', 'Complete');
+SET @current_appointment_seq = NEXT VALUE FOR appointment_seq;
+INSERT INTO Appointment VALUES(@current_appointment_seq,(SELECT Doctor_ID FROM Doctor where Doctor_Name = 'Sudha Mehra'), (SELECT PATIENT_ID FROM Patient where Last_name = 'West'), CAST('06-APR-2024' AS DATE), '16:30:00','Consult', '-', 'No-Show');
+SET @current_appointment_seq = NEXT VALUE FOR appointment_seq;
+INSERT INTO Appointment VALUES(@current_appointment_seq,(SELECT Doctor_ID FROM Doctor where Doctor_Name = 'Miguel Sanchez'), (SELECT PATIENT_ID FROM Patient where Last_name = 'Doran'), CAST('30-MAR-2024' AS DATE), '10:30:15','Consult', '35 minutes', 'Complete');
+SET @current_appointment_seq = NEXT VALUE FOR appointment_seq;
+INSERT INTO Appointment VALUES(@current_appointment_seq,(SELECT Doctor_ID FROM Doctor where Doctor_Name = 'Tony Lee'), (SELECT PATIENT_ID FROM Patient where Last_name = 'Farmer'), CAST('08-APR-2024' AS DATE), '11:00:00','Consult', '20 minutes','Complete');
+SET @current_appointment_seq = NEXT VALUE FOR appointment_seq;
+INSERT INTO Appointment VALUES(@current_appointment_seq,(SELECT Doctor_ID FROM Doctor where Doctor_Name = 'Ariel Hugo'), (SELECT PATIENT_ID FROM Patient where Last_name = 'James'), CAST('21-APR-2024' AS DATE), '09:00:00','Follow-Up', '30 minutes','Scheduled');
+SET @current_appointment_seq = NEXT VALUE FOR appointment_seq;
+INSERT INTO Appointment VALUES(@current_appointment_seq,(SELECT Doctor_ID FROM Doctor where Doctor_Name = 'Sudha Mehra'), (SELECT PATIENT_ID FROM Patient where Last_name = 'Hill'), CAST('06-APR-2024' AS DATE), '11:30:00','Consult', '25 minutes', 'Complete');
+SET @current_appointment_seq = NEXT VALUE FOR appointment_seq;
+INSERT INTO Appointment VALUES(@current_appointment_seq,(SELECT Doctor_ID FROM Doctor where Doctor_Name = 'Ariel Hugo'), (SELECT PATIENT_ID FROM Patient where Last_name = 'Cooper'), CAST('30-MAR-2024' AS DATE), '09:00:00','Consult', '30 minutes', 'Complete');
+SET @current_appointment_seq = NEXT VALUE FOR appointment_seq;
+INSERT INTO Appointment VALUES(@current_appointment_seq,(SELECT Doctor_ID FROM Doctor where Doctor_Name = 'George Marsh'), (SELECT PATIENT_ID FROM Patient where Last_name = 'Scott'), CAST('08-APR-2024' AS DATE), '11:00:00','Consult', '20 minutes','Complete');
+SET @current_appointment_seq = NEXT VALUE FOR appointment_seq;
+INSERT INTO Appointment VALUES(@current_appointment_seq,(SELECT Doctor_ID FROM Doctor where Doctor_Name = 'Tony Lee'), (SELECT PATIENT_ID FROM Patient where Last_name = 'Kart'), CAST('25-APR-2024' AS DATE), '13:30:00','Consult', '30 minutes','Scheduled');
+SET @current_appointment_seq = NEXT VALUE FOR appointment_seq;
+INSERT INTO Appointment VALUES(@current_appointment_seq,(SELECT Doctor_ID FROM Doctor where Doctor_Name = 'Miguel Sanchez'), (SELECT PATIENT_ID FROM Patient where Last_name = 'Jackson'), CAST('28-APR-2024' AS DATE), '09:30:00','Follow-Up', '30 minutes','Scheduled');
+
+SELECT * FROM Appointment;
+
+DECLARE @current_specialty_seq INT = NEXT VALUE FOR specialty_seq;
+INSERT INTO Specialty VALUES(@current_specialty_seq, (SELECT Doctor_ID FROM Doctor where Doctor_name = 'George Marsh'), 'Psychotherapy', 'Southern California Hospital');
+SET @current_specialty_seq = NEXT VALUE FOR specialty_seq;
+INSERT INTO Specialty VALUES(@current_specialty_seq, (SELECT Doctor_ID FROM Doctor where Doctor_name = 'Ariel Hugo'), 'Primary Care', 'Sacred Angel Hospital');
+SET @current_specialty_seq = NEXT VALUE FOR specialty_seq;
+INSERT INTO Specialty VALUES(@current_specialty_seq, (SELECT Doctor_ID FROM Doctor where Doctor_name = 'Miguel Sanchez'), 'Neuropsychiatry', 'New Mission Peaks Hospital');
+SET @current_specialty_seq = NEXT VALUE FOR specialty_seq;
+INSERT INTO Specialty VALUES(@current_specialty_seq, (SELECT Doctor_ID FROM Doctor where Doctor_name = 'Tony Lee'), 'Clinical Psychology', 'New Mission Peaks Hospital');
+SET @current_specialty_seq = NEXT VALUE FOR specialty_seq;
+INSERT INTO Specialty VALUES(@current_specialty_seq, (SELECT Doctor_ID FROM Doctor where Doctor_name = 'Sudha Mehra'), 'Neuropsychology', 'Southern California Hospital');
+SET @current_specialty_seq = NEXT VALUE FOR specialty_seq;
+INSERT INTO Specialty VALUES(@current_specialty_seq, (SELECT Doctor_ID FROM Doctor where Doctor_name = 'Tony Lee'), 'Neuropsychology', 'New Mission Peaks Hospital');
+SET @current_specialty_seq = NEXT VALUE FOR specialty_seq;
+INSERT INTO Specialty VALUES(@current_specialty_seq, (SELECT Doctor_ID FROM Doctor where Doctor_name = 'George Marsh'), 'Clinical Psychology', 'Southern California Hospital');
+
+SELECT * FROM Specialty;
+
+
+DECLARE @current_insurance_seq INT = NEXT VALUE FOR insurance_seq;
+INSERT INTO Insurance VALUES(@current_insurance_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Ellens'), 'Kaiser Permanante', CAST('01-01-2020' AS DATE), 'K021089', '8004644000');
+SET @current_insurance_seq = NEXT VALUE FOR insurance_seq;
+INSERT INTO Insurance VALUES(@current_insurance_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'West'), 'Anthem Blue Cross', CAST('01-01-2022' AS DATE), 'XUI04098798', '8006762583');
+SET @current_insurance_seq = NEXT VALUE FOR insurance_seq;
+INSERT INTO Insurance VALUES(@current_insurance_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Doran'), 'Self-Pay', CAST('03-03-2018' AS DATE), '-', '-');
+SET @current_insurance_seq = NEXT VALUE FOR insurance_seq;
+INSERT INTO Insurance VALUES(@current_insurance_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'James'), 'Aetna', CAST('09-05-2023' AS DATE), 'W87090877', '8886323862');
+SET @current_insurance_seq = NEXT VALUE FOR insurance_seq;
+INSERT INTO Insurance VALUES(@current_insurance_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Farmer'), 'Cigna', CAST('06-07-2019' AS DATE), 'U7092080800', '8002446224');
+SET @current_insurance_seq = NEXT VALUE FOR insurance_seq;
+INSERT INTO Insurance VALUES(@current_insurance_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Cooper'), 'Cigna', CAST('01-01-2022' AS DATE), 'U7841863044', '8002446224');
+SET @current_insurance_seq = NEXT VALUE FOR insurance_seq;
+INSERT INTO Insurance VALUES(@current_insurance_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Kart'), 'Anthem Blue Cross', CAST('04-01-2020' AS DATE), 'XBG80700112', '8006762583');
+SET @current_insurance_seq = NEXT VALUE FOR insurance_seq;
+INSERT INTO Insurance VALUES(@current_insurance_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Jackson'), 'Humana', CAST('01-01-2018' AS DATE), 'H34089212', '8778771051');
+SET @current_insurance_seq = NEXT VALUE FOR insurance_seq;
+INSERT INTO Insurance VALUES(@current_insurance_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Hill'), 'United Healthcare', CAST('01-01-2024' AS DATE), '909139226', '8778423210');
+SET @current_insurance_seq = NEXT VALUE FOR insurance_seq;
+INSERT INTO Insurance VALUES(@current_insurance_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Scott'), 'Cigna', CAST('05-05-2021' AS DATE), 'U6404100911', '8002446224');
+
+SELECT * FROM Insurance;
+
+
+DECLARE @current_children_seq INT = NEXT VALUE FOR children_seq;
+INSERT INTO Children VALUES(@current_children_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Ellens'), 1, 'Yes');
+SET @current_children_seq = NEXT VALUE FOR children_seq;
+INSERT INTO Children VALUES(@current_children_seq,(SELECT PATIENT_ID FROM Patient where Last_name = 'West'), 1, 'No');
+SET @current_children_seq = NEXT VALUE FOR children_seq;
+INSERT INTO Children VALUES(@current_children_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Doran'), 0, 'No');
+SET @current_children_seq = NEXT VALUE FOR children_seq;
+INSERT INTO Children VALUES(@current_children_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'James'), 2, 'No');
+SET @current_children_seq = NEXT VALUE FOR children_seq;
+INSERT INTO Children VALUES(@current_children_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Farmer'), 2, 'Yes');
+SET @current_children_seq = NEXT VALUE FOR children_seq;
+INSERT INTO Children VALUES(@current_children_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Hill'), 0, 'No');
+SET @current_children_seq = NEXT VALUE FOR children_seq;
+INSERT INTO Children VALUES(@current_children_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Jackson'), 1, 'No');
+SET @current_children_seq = NEXT VALUE FOR children_seq;
+INSERT INTO Children VALUES(@current_children_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Scott'), 2, 'No');
+SET @current_children_seq = NEXT VALUE FOR children_seq;
+INSERT INTO Children VALUES(@current_children_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Kart'), 2, 'No' );
+SET @current_children_seq = NEXT VALUE FOR children_seq;
+INSERT INTO Children VALUES(@current_children_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Cooper'), 1, 'No');
+
+SELECT * FROM Children;
+
+
+DECLARE @current_diagnosis_seq INT = NEXT VALUE FOR diagnosis_seq;
+INSERT INTO Diagnosis VALUES(@current_diagnosis_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Ellens'), 'Anxiety', 'Initial diagnosis of patient over the phone confirmed anxiety, patient said they will make a visit. Refer to physical report for more info.');
+SET @current_diagnosis_seq = NEXT VALUE FOR diagnosis_seq;
+INSERT INTO Diagnosis VALUES(@current_diagnosis_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Doran'), 'Insomnia', 'Patient complained of sleeplessness and requested a video consult, refer to e-report for more info ');
+SET @current_diagnosis_seq = NEXT VALUE FOR diagnosis_seq;
+INSERT INTO Diagnosis VALUES(@current_diagnosis_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'West'), 'Panic attacks', 'Patient complained of Panic attacks and requested a video consult, however advised to patient to walk-in directly');
+SET @current_diagnosis_seq = NEXT VALUE FOR diagnosis_seq;
+INSERT INTO Diagnosis VALUES(@current_diagnosis_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'James'), 'Anxiety', 'Initial diagnosis of patient over the phone confirmed anxiety, patient said they will make a visit. Refer to report for more info.');
+SET @current_diagnosis_seq = NEXT VALUE FOR diagnosis_seq;
+INSERT INTO Diagnosis VALUES(@current_diagnosis_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Farmer'), 'Addiction to alcohol', 'Patient wanted to check if we can treat their alcohol addiction, refer to report for more ');
+SET @current_diagnosis_seq = NEXT VALUE FOR diagnosis_seq;
+INSERT INTO Diagnosis VALUES(@current_diagnosis_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Kart'), 'Insomnia', 'Patient had Insomnia as their chief complaint and have scheduled an appt, call back for confirmation.. ');
+SET @current_diagnosis_seq = NEXT VALUE FOR diagnosis_seq;
+INSERT INTO Diagnosis VALUES(@current_diagnosis_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Jackson'), 'Eating disorder', 'Patient called with an eating disorder, checked their family history and have scheduled their appointment for direct assessment ');
+SET @current_diagnosis_seq = NEXT VALUE FOR diagnosis_seq;
+INSERT INTO Diagnosis VALUES(@current_diagnosis_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Cooper'), 'Anxiety', 'Patient had anxiety issues, discussed episodes of history, refer to report for more ');
+SET @current_diagnosis_seq = NEXT VALUE FOR diagnosis_seq;
+INSERT INTO Diagnosis VALUES(@current_diagnosis_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Hill'), 'Anxiety', 'Patient complains of breathing issues due to their anxiety, inquired about likely family history, refer to report for more ');
+SET @current_diagnosis_seq = NEXT VALUE FOR diagnosis_seq;
+INSERT INTO Diagnosis VALUES(@current_diagnosis_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Scott'), 'Stress', 'Patient had lost their job and is under severe stress, refer to report for more ');
+
+SELECT * FROM Diagnosis;
+
+
+
+DECLARE @current_his_diagnosis_seq INT = NEXT VALUE FOR his_diagnosis_seq;
+INSERT INTO Historical_Diagnosis VALUES(@current_his_diagnosis_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'Ellens'), 'Anxiety attack', 'Patient had a history of anxiety 2 years ago and had taken treatment. Refer to report for more info.');
+SET @current_his_diagnosis_seq = NEXT VALUE FOR his_diagnosis_seq;
+INSERT INTO Historical_Diagnosis VALUES(@current_his_diagnosis_seq,(SELECT PATIENT_ID FROM Patient where Last_name = 'Doran'), 'N/A', 'No past history of similar diagnosis');
+SET @current_his_diagnosis_seq = NEXT VALUE FOR his_diagnosis_seq;
+INSERT INTO Historical_Diagnosis VALUES(@current_his_diagnosis_seq, (SELECT PATIENT_ID FROM Patient where Last_name = 'West'), 'Panic attacks', 'Patient was unable to provide more details over the phone and was asked to make a visit for further assessment');
+SET @current_his_diagnosis_seq = NEXT VALUE FOR his_diagnosis_seq;
+INSERT INTO Historical_Diagnosis VALUES(@current_his_diagnosis_seq,(SELECT PATIENT_ID FROM Patient where Last_name = 'James'), 'N/A', 'No past history of similar diagnosis');
+SET @current_his_diagnosis_seq = NEXT VALUE FOR his_diagnosis_seq;
+INSERT INTO Historical_Diagnosis VALUES(@current_his_diagnosis_seq,(SELECT PATIENT_ID FROM Patient where Last_name = 'Farmer'), 'Addiction to drugs', 'Patient was into drugs for a while and have recently started alcohol.');
+SET @current_his_diagnosis_seq = NEXT VALUE FOR his_diagnosis_seq;
+INSERT INTO Historical_Diagnosis VALUES(@current_his_diagnosis_seq,(SELECT PATIENT_ID FROM Patient where Last_name = 'Jackson'), 'Eating disorder','Health history info revealed no past issues in eating');
+SET @current_his_diagnosis_seq = NEXT VALUE FOR his_diagnosis_seq;
+INSERT INTO Historical_Diagnosis VALUES(@current_his_diagnosis_seq,(SELECT PATIENT_ID FROM Patient where Last_name = 'Cooper'), 'Anxiety',  'Patient has recurring anxiety issues in the past months, patient was into paleo for a while, ref report for more');
+SET @current_his_diagnosis_seq = NEXT VALUE FOR his_diagnosis_seq;
+INSERT INTO Historical_Diagnosis VALUES(@current_his_diagnosis_seq,(SELECT PATIENT_ID FROM Patient where Last_name = 'Hill'), 'Palpitations', 'No past history of Anxiety but patient reported of palpitations');
+SET @current_his_diagnosis_seq = NEXT VALUE FOR his_diagnosis_seq;
+INSERT INTO Historical_Diagnosis VALUES(@current_his_diagnosis_seq,(SELECT PATIENT_ID FROM Patient where Last_name = 'Scott'), 'Stress', 'Patient has experienced a lot of stress due to their job in the past few months');
+SET @current_his_diagnosis_seq = NEXT VALUE FOR his_diagnosis_seq;
+INSERT INTO Historical_Diagnosis VALUES(@current_his_diagnosis_seq,(SELECT PATIENT_ID FROM Patient where Last_name = 'Kart'), 'Insomnia', 'Patient has been having intermittent sleeping issues from a long time. Ref report for more');
+
+SELECT * FROM Historical_Diagnosis;
+
+
+
+DECLARE @current_medication_seq INT = NEXT VALUE FOR medication_seq;
+INSERT INTO Medication VALUES(@current_medication_seq, (SELECT Patient_ID FROM Patient WHERE Last_name = 'Ellens'), 'Tofranil', '69874-992-01', 'Thompson Medicals', CAST ('08-MAY-2023' AS DATE), CAST ('07-MAY-2025' AS DATE));
+SET @current_medication_seq = NEXT VALUE FOR medication_seq;
+INSERT INTO Medication VALUES(@current_medication_seq, (SELECT Patient_ID FROM Patient WHERE Last_name = 'Doran'), 'Aspirin', '0363-0587-14', 'Walgreen Company', CAST ('01-JAN-2024' AS DATE), CAST('31-DEC-2025' AS DATE));
+SET @current_medication_seq = NEXT VALUE FOR medication_seq;
+INSERT INTO Medication VALUES(@current_medication_seq, (SELECT Patient_ID FROM Patient WHERE Last_name = 'Doran'), 'Benadryl', '50580-226-20', 'Johnson & Johnson', CAST ('11-APR-2024' AS DATE), CAST('10-APR-2025' AS DATE));
+SET @current_medication_seq = NEXT VALUE FOR medication_seq;
+INSERT INTO Medication VALUES(@current_medication_seq, (SELECT Patient_ID FROM Patient WHERE Last_name = 'Cooper'), 'Xanax', '0009-0029-01', 'Pharmacia-Upjohn Co', CAST ('18-AUG-2023' AS DATE), CAST('17-AUG-2025' AS DATE));
+SET @current_medication_seq = NEXT VALUE FOR medication_seq;
+INSERT INTO Medication VALUES(@current_medication_seq,(SELECT Patient_ID FROM Patient WHERE Last_name = 'Cooper'), 'Lorazepam', '0187-0063-01', 'Bausch Health US', CAST ('16-DEC-2023' AS DATE), CAST ('15-DEC-2024' AS DATE));
+SET @current_medication_seq = NEXT VALUE FOR medication_seq;
+INSERT INTO Medication VALUES(@current_medication_seq,(SELECT Patient_ID FROM Patient WHERE Last_name = 'Scott'),'Unisom','41167-0063-5', 'Chattem, Inc', CAST ('03-APR-2024' AS DATE), CAST('02-APR-2025' AS DATE));
+SET @current_medication_seq = NEXT VALUE FOR medication_seq;
+INSERT INTO Medication VALUES(@current_medication_seq,(SELECT Patient_ID FROM Patient WHERE Last_name = 'Hill'),'Digoxin','21695-678-30', 'Rebel Distributors', CAST ('29-MAR-2024' AS DATE), CAST('28-MAR-2025' AS DATE));
+SET @current_medication_seq = NEXT VALUE FOR medication_seq;
+INSERT INTO Medication VALUES(@current_medication_seq,(SELECT Patient_ID FROM Patient WHERE Last_name = 'Doran'),'Omega-3 Lovaza','69784-420-12', 'Epic Pharma', CAST ('19-JUL-2024' AS DATE), CAST('18-JUL-2026' AS DATE));
+SET @current_medication_seq = NEXT VALUE FOR medication_seq;
+
+SELECT * FROM Medication;
+
+
+
+DECLARE @current_prescription_type_seq INT  = NEXT VALUE FOR prescription_type_seq;
+INSERT INTO Prescription_Type VALUES(@current_prescription_type_seq, 'Capsules', 'Ten in a strip', 'Walgreens');
+SET @current_prescription_type_seq = NEXT VALUE FOR prescription_type_seq;
+INSERT INTO Prescription_Type VALUES(@current_prescription_type_seq, 'Tablets', 'Ten in a strip', 'CVS');
+SET @current_prescription_type_seq = NEXT VALUE FOR prescription_type_seq;
+INSERT INTO Prescription_Type VALUES(@current_prescription_type_seq, 'Syrup', '2 bottles', 'Safeway');
+
+SELECT * FROM Prescription_Type;
+
+DECLARE @current_otc_seq INT  = NEXT VALUE FOR otc_seq;
+INSERT INTO OTC VALUES((SELECT Medication_ID from Medication WHERE Medication_Name LIKE '%Aspirin%'), '12', 'If less than 12, need adult monitoring');
+SET @current_otc_seq  = NEXT VALUE FOR otc_seq;
+INSERT INTO OTC VALUES((SELECT Medication_ID from Medication WHERE Medication_Name LIKE '%Benadryl%'), '10', 'Safe quantity is advised with parental control');
+SET @current_otc_seq  = NEXT VALUE FOR otc_seq;
+INSERT INTO OTC VALUES((SELECT Medication_ID from Medication WHERE Medication_Name LIKE '%Unisom%'), '14', 'If less than 14, need elderly supervision');
+SET @current_otc_seq  = NEXT VALUE FOR otc_seq;
+INSERT INTO OTC VALUES((SELECT Medication_ID from Medication WHERE Medication_Name LIKE '%Lovaza%'), '-', 'Applies for everyone');
+
+SELECT * FROM OTC;
+
+DECLARE @current_prescription_seq INT  = NEXT VALUE FOR prescription_seq;
+INSERT INTO Prescription VALUES((SELECT Medication_ID from Medication WHERE Medication_Name LIKE '%Tofranil%'),(SELECT Doctor_ID FROM Doctor where Doctor_Name = 'George Marsh'), (SELECT Pres_Type_ID from Prescription_Type WHERE Pres_Method = 'Tablets'), 'E-prescription', Cast('02-APR-2024' AS DATE));
+SET  @current_prescription_seq  = NEXT VALUE FOR prescription_seq;
+INSERT INTO Prescription VALUES((SELECT Medication_ID from Medication WHERE Medication_Name LIKE '%Xanax%'),(SELECT Doctor_ID FROM Doctor where Doctor_Name = 'Ariel Hugo'),  (SELECT Pres_Type_ID from Prescription_Type WHERE Pres_Method = 'Tablets'), 'E-prescription', Cast('02-APR-2024' AS DATE));
+SET  @current_prescription_seq  = NEXT VALUE FOR prescription_seq;
+INSERT INTO Prescription VALUES((SELECT Medication_ID from Medication WHERE Medication_Name LIKE '%Lorazepam%'),(SELECT Doctor_ID FROM Doctor where Doctor_Name = 'Ariel Hugo'),  (SELECT Pres_Type_ID from Prescription_Type WHERE Pres_Method = 'Tablets'), 'Hand-written', Cast('30-MAR-2024' AS DATE));
+SET  @current_prescription_seq  = NEXT VALUE FOR prescription_seq;
+INSERT INTO Prescription VALUES((SELECT Medication_ID from Medication WHERE Medication_Name LIKE '%Digoxin%'),(SELECT Doctor_ID FROM Doctor where Doctor_Name = 'Sudha Mehra'), (SELECT Pres_Type_ID from Prescription_Type WHERE Pres_Method = 'Capsules'), 'E-prescription', Cast('06-APR-2024' AS DATE));
+
+SELECT * FROM Prescription;
+
+--Reusable stored procedures
+
+-- Stored procedure #1
+
+CREATE OR ALTER PROCEDURE AddNewPatient 
+          @First_name VARCHAR(50), @Last_name VARCHAR(50), @Age DECIMAL(2), @Gender VARCHAR(20), @Phone_number DECIMAL(10),
+          @Email VARCHAR(50), @Home_Address VARCHAR(50), @Register_Date DATE
+AS
+BEGIN
+
+   INSERT INTO Patient(Patient_ID, First_Name, Last_Name, Age, Gender, Phone_Number, Email, Home_Address, Register_Date)
+   VALUES(NEXT VALUE FOR patient_seq, @First_name, @Last_name, @Age, @Gender, @Phone_number,@Email, @Home_Address, @Register_Date);
+   END;
+
+CREATE TRIGGER EMAIL_CHECK
+ON Patient AFTER INSERT, UPDATE
+AS
+BEGIN
+    DECLARE @Email VARCHAR(50);
+	SET @Email = (SELECT INSERTED.Email from INSERTED);
+	
+	IF(@EMAIL) NOT LIKE '%@%'
+	BEGIN
+	  ROLLBACK;
+	  RAISERROR('Invalid Email', 14,2);
+  END;
+END;
+
+BEGIN TRANSACTION AddNewPatient;
+EXECUTE AddNewPatient 'Vanessa', 'Brown', 27, 'Female', '2904544480', 'vbrown97@yahoo.com', '201 Donnelly ave, Monterey Bay, CA', '2024-04-13';
+COMMIT TRANSACTION AddNewPatient;
+
+SELECT * FROM Patient;
+
+-- Stored procedure #2
+
+CREATE OR ALTER PROCEDURE AddNewDoctor
+          @Doctor_Name VARCHAR(50), @Doctor_Type VARCHAR(50), @Effective_Date DATE
+AS
+BEGIN
+  
+  
+   INSERT INTO Doctor(Doctor_ID, Doctor_Name, Doctor_Type, Effective_Date)
+   VALUES(NEXT VALUE FOR doctor_seq,@Doctor_Name, @Doctor_Type, @Effective_Date);
+   END;
+
+
+CREATE TRIGGER NAME_CHECK
+ON Doctor AFTER INSERT, UPDATE
+AS
+BEGIN
+    DECLARE @Doctor_Name VARCHAR(50);
+	SET @Doctor_Name = (SELECT INSERTED.Doctor_Name from INSERTED);
+	
+	IF(@Doctor_Name) NOT LIKE '% %'
+	BEGIN
+	ROLLBACK;
+	RAISERROR('Invalid name format', 16,2);
+  END;
+END;
+
+
+BEGIN TRANSACTION AddNewDoctor;
+EXECUTE AddNewDoctor 'Rose Miller', 'Student Nurse', '2024-04-13';
+COMMIT TRANSACTION AddNewDoctor;
+
+SELECT * FROM Doctor;
+
+
+--QUERY EXECUTIONS AND EXPLANATIONS
+
+--QUERY 1
+
+SELECT Patient.First_name, Patient.Last_name, Doctor.Doctor_Name, Appointment.Appointment_Date, Appointment.Appointment_Status Insurance,Insurance_Name, Insurance.Policy_Number, Insurance.Insurance_Phone
+FROM Patient
+INNER JOIN Appointment ON Appointment.Patient_ID = Patient.Patient_ID
+INNER JOIN Insurance ON Insurance.Patient_ID = Patient.Patient_ID
+INNER JOIN Doctor ON Appointment.Doctor_ID = Doctor.Doctor_ID WHERE Appointment_Status = 'Complete'
+ORDER BY First_name,Last_Name,Insurance_Name;
+
+
+--QUERY 2
+
+SELECT Patient.First_name, Patient.Last_name, Patient.Phone_number, Medication.Medication_Name, Prescription.Pres_Mode, Prescription_Type.Pres_Method,
+       Prescription_Type.Pres_quantity, Prescription_Type.Pharmacy_Name
+FROM Patient
+INNER JOIN Medication ON Medication.Patient_ID = Patient.Patient_ID
+INNER JOIN Prescription ON Prescription.Medication_ID = Medication.Medication_ID
+INNER JOIN Prescription_Type ON Prescription.Pres_Type_ID =  Prescription_Type.Pres_Type_ID WHERE Medication_Name = 'Tofranil';
+
+
+--QUERY 3
+
+CREATE OR ALTER VIEW DX_Narrow_Down AS
+SELECT Patient.First_name, Patient.Last_name, Patient.Age, Children.Number_Of_Children, Historical_Diagnosis.Historical_Diagnosis_Name, Diagnosis.Diagnosis_Name
+
+FROM Patient
+INNER JOIN Children ON Children.Patient_ID = Patient.Patient_ID
+INNER JOIN Historical_Diagnosis ON Historical_Diagnosis.Patient_ID = Patient.Patient_ID
+INNER JOIN Diagnosis ON Diagnosis.Patient_ID =  Patient.Patient_ID WHERE Diagnosis_Name LIKE '%Anxiety%' AND Age<40
+
+
+SELECT * FROM DX_Narrow_Down
+ORDER BY First_name;
+
+
+ -- History table and trigger
+
+ CREATE TABLE NDC_Change (
+NDC_Change_ID DECIMAL(12) NOT NULL PRIMARY KEY,
+Old_NDC VARCHAR (20) NOT NULL,
+New_NDC VARCHAR (20) NOT NULL,
+Medication_ID DECIMAL(12) NOT NULL,
+Change_Date DATE NOT NULL,
+FOREIGN KEY (Medication_ID) REFERENCES Medication(Medication_ID));
+
+CREATE SEQUENCE NDC_Change_seq START WITH 1;
+
+CREATE TRIGGER NDC_Change_Trg
+ON Medication
+AFTER UPDATE
+AS
+BEGIN
+    DECLARE @Old_NDC VARCHAR(20) = (SELECT NDC_Number FROM DELETED);
+	DECLARE @New_NDC VARCHAR(20) = (SELECT NDC_Number FROM INSERTED);
+
+	IF(@Old_NDC <> @New_NDC)
+	   INSERT INTO NDC_Change(NDC_Change_ID,Old_NDC,New_NDC,Medication_ID,Change_Date)
+	   VALUES(NEXT VALUE FOR NDC_Change_seq, @Old_NDC, @New_NDC, (SELECT Medication_ID FROM INSERTED), GETDATE());
+END;
+
+UPDATE Medication
+SET NDC_Number = '0187-0064-10'
+WHERE Medication_ID = 5;
+
+UPDATE Medication
+SET NDC_Number = '0187-0065-50'
+WHERE Medication_ID = 5;
+
+SELECT * 
+FROM NDC_Change;
+
+
+--VISUALIZATIONS
+
+SELECT Insurance.Insurance_Name, COUNT(*) AS Total_patients
+FROM Insurance
+JOIN Patient ON Patient.Patient_ID = Insurance.Patient_ID
+GROUP BY Insurance.Insurance_Name
+ORDER BY Total_patients DESC;
+
+
+SELECT Children.Is_Autistic, COUNT(*) AS Number_of_Patients
+FROM Children
+JOIN Patient on Patient.Patient_ID = Children.Patient_ID
+GROUP BY Children.Is_Autistic
+ORDER BY Number_of_Patients DESC;
