@@ -30,7 +30,7 @@ Launch the SQL client you have installed on your machine.
 
 Open the SQL file in your SQL client.
 
-Copy the script from line 32-436 to your SQL client and run the script.
+Select the script from line 32-436 in your SQL client and click the Run button.
 You will be able to see the data in form of organized tables.
 
 3. Running Queries
@@ -55,10 +55,12 @@ Feel free to modify and extend the queries as needed for your specific use case.
 
 If you encounter any issues, consider the following troubleshooting steps:
 
-Syntax Errors: Double-check the SQL syntax in your scripts.
-Database Connection: Ensure your SQL client is properly connected to the database.
-Permissions: Verify that your user account has the necessary permissions to create databases, tables, and perform data manipulations.
-Contributing
+**Syntax Errors**: Double-check the SQL syntax in your scripts.
+**Database Connection**: Ensure your SQL client is properly connected to the database.
+**Permissions**: Verify that your user account has the necessary permissions to create databases, tables, and perform data manipulations.
+
+**Contributing**
+
 If you would like to contribute to this project, please fork the repository and submit a pull request. We welcome all improvements and suggestions!
 
 **License**
