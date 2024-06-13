@@ -64,8 +64,6 @@ If you would like to contribute to this project, please fork the repository and 
 **License**
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-By following these instructions, you should be able to set up and run the SQL project successfully. Enjoy working with your database!
-
 
 
 
