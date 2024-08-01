@@ -64,7 +64,7 @@ If you encounter any issues, consider the following troubleshooting steps:
 If you would like to contribute to this project, please fork the repository and submit a pull request. We welcome all improvements and suggestions!
 
 **License**
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](License.txt) file for details.
 
 
 
